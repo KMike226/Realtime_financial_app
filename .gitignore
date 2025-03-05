@@ -38,6 +38,10 @@ TASK_MANAGEMENT_GUIDE.md
 /tmp/
 *.tmp
 
+# Jupyter Notebooks (contains API keys)
+*.ipynb
+main.ipynb
+
 # Task files
 # tasks.json
 # tasks/ 

@@ -79,18 +79,41 @@ resource "aws_kinesis_firehose_delivery_stream" "s3_delivery" {
     role_arn   = aws_iam_role.firehose_role.arn
     bucket_arn = var.s3_bucket_arn
     
-    prefix = "year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/hour=!{timestamp:HH}/"
+    prefix = "financial-data/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/hour=!{timestamp:HH}/"
+    error_output_prefix = "errors/"
     
     buffering_size     = 5
     buffering_interval = 300
     
     compression_format = "GZIP"
+
+    cloudwatch_logging_options {
+      enabled         = true
+      log_group_name  = aws_cloudwatch_log_group.firehose_logs.name
+      log_stream_name = aws_cloudwatch_log_stream.firehose_logs.name
+    }
   }
 
   tags = {
     Name        = "${var.project_name}-${var.environment}-s3-delivery"
     Environment = var.environment
   }
+}
+
+# CloudWatch Log Group pour Firehose
+resource "aws_cloudwatch_log_group" "firehose_logs" {
+  name              = "/aws/kinesisfirehose/${var.project_name}-${var.environment}-s3-delivery"
+  retention_in_days = 14
+
+  tags = {
+    Name        = "${var.project_name}-${var.environment}-firehose-logs"
+    Environment = var.environment
+  }
+}
+
+resource "aws_cloudwatch_log_stream" "firehose_logs" {
+  name           = "S3Delivery"
+  log_group_name = aws_cloudwatch_log_group.firehose_logs.name
 }
 
 # Rôle IAM pour Kinesis Firehose
@@ -132,6 +155,17 @@ resource "aws_iam_role_policy" "firehose_policy" {
         Resource = [
           var.s3_bucket_arn,
           "${var.s3_bucket_arn}/*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = [
+          "arn:aws:logs:*:*:log-group:/aws/kinesisfirehose/*"
         ]
       }
     ]
