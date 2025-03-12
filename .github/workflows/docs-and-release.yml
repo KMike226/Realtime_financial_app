@@ -1,0 +1,160 @@
+name: Documentation and Release
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '**.md'
+      - 'docs/**'
+      - '.github/workflows/docs-and-release.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - '**.md'
+      - 'docs/**'
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  lint-docs:
+    name: Lint Documentation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Install markdownlint
+      run: npm install -g markdownlint-cli
+      
+    - name: Lint Markdown files
+      run: markdownlint '**/*.md' --ignore node_modules --ignore .git
+      continue-on-error: true
+
+  generate-docs:
+    name: Generate Documentation
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install documentation tools
+      run: |
+        pip install sphinx sphinx-rtd-theme myst-parser
+        
+    - name: Generate architecture documentation
+      run: |
+        mkdir -p docs/generated
+        
+        # Generate Terraform documentation
+        if [ -d "infrastructure/terraform" ]; then
+          echo "# Infrastructure Documentation" > docs/generated/infrastructure.md
+          echo "" >> docs/generated/infrastructure.md
+          find infrastructure/terraform -name "*.tf" -exec echo "## {}" \; -exec cat {} \; -exec echo "" \; >> docs/generated/infrastructure.md
+        fi
+        
+        # Generate API documentation from code
+        if [ -d "stream-processing" ]; then
+          echo "# Stream Processing Documentation" > docs/generated/stream-processing.md
+          echo "" >> docs/generated/stream-processing.md
+          find stream-processing -name "*.py" -exec echo "## {}" \; -exec echo '```python' \; -exec cat {} \; -exec echo '```' \; -exec echo "" \; >> docs/generated/stream-processing.md
+        fi
+        
+    - name: Upload documentation artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: documentation
+        path: docs/generated/
+
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, 'release:')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Extract version from commit message
+      id: extract_version
+      run: |
+        VERSION=$(echo "${{ github.event.head_commit.message }}" | grep -oP 'release:\s*v?\K[0-9]+\.[0-9]+\.[0-9]+')
+        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+        echo "Extracted version: $VERSION"
+        
+    - name: Generate changelog
+      id: changelog
+      run: |
+        # Generate changelog from git commits since last tag
+        LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+        if [ -z "$LAST_TAG" ]; then
+          CHANGELOG=$(git log --pretty=format:"- %s (%an)" --since="1 month ago")
+        else
+          CHANGELOG=$(git log --pretty=format:"- %s (%an)" ${LAST_TAG}..HEAD)
+        fi
+        echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
+        echo "$CHANGELOG" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+        
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ steps.extract_version.outputs.VERSION }}
+        release_name: Release v${{ steps.extract_version.outputs.VERSION }}
+        body: |
+          ## Changes in this Release
+          
+          ${{ steps.changelog.outputs.CHANGELOG }}
+          
+          ## Infrastructure
+          - Terraform configurations updated
+          - AWS resources provisioned
+          
+          ## Application
+          - Stream processing components
+          - Data ingestion pipelines
+          - Analytics dashboards
+          
+        draft: false
+        prerelease: false
+
+  deploy-docs:
+    name: Deploy Documentation
+    runs-on: ubuntu-latest
+    needs: [lint-docs, generate-docs]
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download documentation artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: documentation
+        path: docs/generated/
+        
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs
+        cname: ${{ secrets.DOCS_DOMAIN }}
+      continue-on-error: true
