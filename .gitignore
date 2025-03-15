@@ -44,4 +44,14 @@ main.ipynb
 
 # Task files
 # tasks.json
-# tasks/ 
+# tasks/
+
+# Terraform
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfplan.*
+.terraformrc
+terraform.rc 
