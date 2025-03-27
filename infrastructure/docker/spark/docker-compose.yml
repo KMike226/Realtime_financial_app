@@ -1,0 +1,166 @@
+# Docker Compose pour développement local
+# =======================================
+# Configuration pour tester Spark localement avant déploiement
+
+version: '3.8'
+
+services:
+  # Service Spark Master
+  spark-master:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spark-master
+    hostname: spark-master
+    ports:
+      - "8080:8080"  # Master UI
+      - "7077:7077"  # Master port
+    environment:
+      - SPARK_MODE=master
+      - SPARK_MASTER_HOST=spark-master
+      - SPARK_MASTER_PORT=7077
+      - AWS_DEFAULT_REGION=us-east-1
+      - FINANCIAL_DATA_BUCKET=financial-data-lake-dev
+    volumes:
+      - ./logs:/logs
+      - ./tmp/spark-events:/tmp/spark-events
+    networks:
+      - spark-network
+    command: >
+      bash -c "
+        $SPARK_HOME/sbin/start-master.sh &&
+        tail -f $SPARK_HOME/logs/spark-*-master-*.out
+      "
+
+  # Service Spark Worker 1
+  spark-worker-1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spark-worker-1
+    hostname: spark-worker-1
+    ports:
+      - "8081:8081"  # Worker UI
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_CORES=2
+      - SPARK_WORKER_MEMORY=4g
+      - AWS_DEFAULT_REGION=us-east-1
+      - FINANCIAL_DATA_BUCKET=financial-data-lake-dev
+    volumes:
+      - ./logs:/logs
+      - ./tmp/spark-events:/tmp/spark-events
+    networks:
+      - spark-network
+    depends_on:
+      - spark-master
+    command: >
+      bash -c "
+        $SPARK_HOME/sbin/start-worker.sh spark://spark-master:7077 &&
+        tail -f $SPARK_HOME/logs/spark-*-worker-*.out
+      "
+
+  # Service Spark Worker 2
+  spark-worker-2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spark-worker-2
+    hostname: spark-worker-2
+    ports:
+      - "8082:8081"  # Worker UI
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_CORES=2
+      - SPARK_WORKER_MEMORY=4g
+      - AWS_DEFAULT_REGION=us-east-1
+      - FINANCIAL_DATA_BUCKET=financial-data-lake-dev
+    volumes:
+      - ./logs:/logs
+      - ./tmp/spark-events:/tmp/spark-events
+    networks:
+      - spark-network
+    depends_on:
+      - spark-master
+    command: >
+      bash -c "
+        $SPARK_HOME/sbin/start-worker.sh spark://spark-master:7077 &&
+        tail -f $SPARK_HOME/logs/spark-*-worker-*.out
+      "
+
+  # Service PySpark pour développement
+  pyspark-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pyspark-dev
+    hostname: pyspark-dev
+    ports:
+      - "4040:4040"  # Spark UI
+    environment:
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - AWS_DEFAULT_REGION=us-east-1
+      - FINANCIAL_DATA_BUCKET=financial-data-lake-dev
+    volumes:
+      - ./logs:/logs
+      - ./tmp/spark-events:/tmp/spark-events
+      - ./spark-jobs:/app/spark-jobs
+      - ./scripts:/app/scripts
+    networks:
+      - spark-network
+    depends_on:
+      - spark-master
+      - spark-worker-1
+      - spark-worker-2
+    command: >
+      bash -c "
+        sleep 30 &&
+        $SPARK_HOME/bin/pyspark --master spark://spark-master:7077
+      "
+    stdin_open: true
+    tty: true
+
+  # Service Jupyter Notebook pour développement
+  jupyter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jupyter-spark
+    hostname: jupyter-spark
+    ports:
+      - "8888:8888"  # Jupyter UI
+    environment:
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - AWS_DEFAULT_REGION=us-east-1
+      - FINANCIAL_DATA_BUCKET=financial-data-lake-dev
+    volumes:
+      - ./notebooks:/app/notebooks
+      - ./logs:/logs
+      - ./tmp/spark-events:/tmp/spark-events
+    networks:
+      - spark-network
+    depends_on:
+      - spark-master
+      - spark-worker-1
+      - spark-worker-2
+    command: >
+      bash -c "
+        pip3 install jupyter &&
+        sleep 30 &&
+        jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root --notebook-dir=/app/notebooks
+      "
+
+# Réseau pour la communication entre services
+networks:
+  spark-network:
+    driver: bridge
+    name: spark-network
+
+# Volumes pour la persistance des données
+volumes:
+  spark-logs:
+    driver: local
+  spark-events:
+    driver: local
