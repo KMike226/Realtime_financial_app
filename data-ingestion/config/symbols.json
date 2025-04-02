@@ -1,0 +1,32 @@
+{
+  "stocks": {
+    "tech": [
+      "AAPL", "GOOGL", "MSFT", "AMZN", "META", "NVDA", "TSLA", 
+      "NFLX", "ORCL", "CRM", "IBM", "INTC", "AMD", "UBER", "SNAP"
+    ],
+    "finance": [
+      "JPM", "BAC", "WFC", "GS", "MS", "C", "USB", "PNC", "TFC", "COF"
+    ],
+    "healthcare": [
+      "JNJ", "PFE", "UNH", "MRCK", "ABT", "TMO", "DHR", "BMY", "ABBV", "LLY"
+    ],
+    "energy": [
+      "XOM", "CVX", "COP", "EOG", "SLB", "PSX", "VLO", "MPC", "OXY", "KMI"
+    ],
+    "consumer": [
+      "PG", "KO", "PEP", "WMT", "HD", "MCD", "DIS", "NKE", "SBUX", "TGT"
+    ]
+  },
+  "indices": [
+    "SPY", "QQQ", "IWM", "DIA", "VTI", "VXUS", "EFA", "EEM", "VWO", "AGG"
+  ],
+  "commodities": [
+    "GLD", "SLV", "USO", "UNG", "DBA", "DBC", "PDBC", "GSG", "BCI", "UUP"
+  ],
+  "crypto_related": [
+    "COIN", "MARA", "RIOT", "CLSK", "BITF", "CAN", "HIVE", "ARBK", "BTBT", "SOS"
+  ],
+  "priority_symbols": [
+    "AAPL", "GOOGL", "MSFT", "AMZN", "TSLA", "META", "NVDA", "SPY", "QQQ", "GLD"
+  ]
+}
