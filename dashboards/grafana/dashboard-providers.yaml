@@ -1,0 +1,38 @@
+# Configuration des providers de dashboards
+# ========================================
+
+apiVersion: 1
+
+providers:
+  # Provider principal pour dashboards financiers
+  - name: 'Financial Platform Dashboards'
+    orgId: 1
+    folder: 'Financial Platform'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
+
+  # Provider pour dashboards système
+  - name: 'System Monitoring'
+    orgId: 1
+    folder: 'System'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/system-dashboards
+
+  # Provider pour dashboards de développement
+  - name: 'Development'
+    orgId: 1
+    folder: 'Development'
+    type: file
+    disableDeletion: true
+    updateIntervalSeconds: 60
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dev-dashboards

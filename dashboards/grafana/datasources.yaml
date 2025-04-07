@@ -1,0 +1,81 @@
+# Configuration des sources de données Grafana
+# ===========================================
+
+apiVersion: 1
+
+datasources:
+  # CloudWatch pour métriques AWS
+  - name: CloudWatch
+    type: cloudwatch
+    access: proxy
+    uid: cloudwatch
+    jsonData:
+      authType: default
+      defaultRegion: us-east-1
+      customMetricsNamespaces: "AWS/Lambda,AWS/Kinesis,AWS/S3,CWAgent,FinancialPlatform"
+    editable: true
+
+  # Athena pour requêtes S3
+  - name: Athena
+    type: grafana-athena-datasource
+    access: proxy
+    uid: athena
+    jsonData:
+      authType: default
+      defaultRegion: us-east-1
+      catalog: AwsDataCatalog
+      database: financial_data
+      workgroup: primary
+      s3OutputLocation: s3://financial-platform-dev-data-lake/athena-results/
+    editable: true
+
+  # S3 direct access (si nécessaire)
+  - name: S3
+    type: grafana-s3-datasource
+    access: proxy
+    uid: s3
+    jsonData:
+      authType: default
+      defaultRegion: us-east-1
+      defaultBucket: financial-platform-dev-data-lake
+    editable: true
+
+  # Prometheus pour métriques custom (si déployé)
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    uid: prometheus
+    url: http://prometheus:9090
+    jsonData:
+      timeInterval: "5s"
+      queryTimeout: "60s"
+      httpMethod: "GET"
+    editable: true
+    isDefault: false
+
+  # Logs CloudWatch
+  - name: CloudWatch Logs
+    type: cloudwatch
+    access: proxy
+    uid: cloudwatch-logs
+    jsonData:
+      authType: default
+      defaultRegion: us-east-1
+      defaultLogGroups: 
+        - "/aws/lambda/financial-platform-dev-kinesis-processor"
+        - "/aws/lambda/financial-platform-dev-alert-processor"
+        - "/aws/ecs/financial-platform-dev-grafana"
+        - "/aws/apigateway/financial-platform-dev"
+    editable: true
+
+  # TestData pour les tests et développement
+  - name: TestData
+    type: testdata
+    access: proxy
+    uid: testdata
+    editable: true
+    isDefault: false
+
+deleteDatasources:
+  - name: "Old CloudWatch"
+    orgId: 1

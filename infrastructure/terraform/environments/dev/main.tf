@@ -81,6 +81,40 @@ module "iam" {
   crypto_stream_arn  = module.kinesis.crypto_stream_arn
 }
 
+# Module EMR pour le traitement Spark
+module "emr" {
+  source = "../../modules/emr"
+
+  project_name       = var.project_name
+  environment        = "dev"
+  vpc_id             = module.vpc.vpc_id
+  private_subnet_ids = module.vpc.private_subnet_ids
+  s3_bucket_name     = module.data_lake.bucket_name
+
+  # Configuration optimisée pour le développement
+  master_instance_type = "m5.xlarge"
+  core_instance_type   = "m5.large"
+  core_instance_count  = 2
+
+  # Auto-scaling pour le développement
+  auto_scaling_min_capacity = 1
+  auto_scaling_max_capacity = 5
+
+  # Optimisations de coût pour dev
+  auto_termination_timeout = 3600 # 1 heure d'inactivité
+  spot_instance_percentage = 50   # 50% d'instances Spot
+
+  # Monitoring modéré
+  cpu_alarm_threshold    = 80
+  memory_alarm_threshold = 85
+
+  depends_on = [
+    module.vpc,
+    module.data_lake,
+    module.security
+  ]
+}
+
 # Outputs
 output "vpc_id" {
   description = "ID du VPC créé"
@@ -135,4 +169,40 @@ output "lambda_security_group_id" {
 output "ec2_spark_security_group_id" {
   description = "ID du security group EC2 Spark"
   value       = module.security.ec2_spark_security_group_id
+}
+
+# Outputs EMR
+output "emr_cluster_id" {
+  description = "ID du cluster EMR"
+  value       = module.emr.cluster_id
+}
+
+output "emr_cluster_name" {
+  description = "Nom du cluster EMR"
+  value       = module.emr.cluster_name
+}
+
+output "emr_master_public_dns" {
+  description = "DNS public du nœud master EMR"
+  value       = module.emr.master_public_dns
+}
+
+output "emr_spark_ui_url" {
+  description = "URL de l'interface Spark EMR"
+  value       = module.emr.spark_ui_url
+}
+
+output "emr_yarn_ui_url" {
+  description = "URL de l'interface YARN EMR"
+  value       = module.emr.yarn_ui_url
+}
+
+output "emr_zeppelin_url" {
+  description = "URL de Zeppelin EMR"
+  value       = module.emr.zeppelin_url
+}
+
+output "emr_ssh_command" {
+  description = "Commande SSH pour se connecter au cluster EMR"
+  value       = module.emr.ssh_command
 }

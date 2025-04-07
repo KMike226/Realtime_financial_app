@@ -1,0 +1,472 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "System Infrastructure Monitoring",
+    "tags": [
+      "system",
+      "infrastructure",
+      "monitoring",
+      "aws"
+    ],
+    "style": "dark",
+    "timezone": "UTC",
+    "editable": true,
+    "hideControls": false,
+    "graphTooltip": 1,
+    "time": {
+      "from": "now-30m",
+      "to": "now"
+    },
+    "timepicker": {
+      "refresh_intervals": [
+        "10s",
+        "30s",
+        "1m",
+        "5m",
+        "15m",
+        "30m",
+        "1h"
+      ]
+    },
+    "refresh": "30s",
+    "schemaVersion": 27,
+    "version": 1,
+    "panels": [
+      {
+        "id": 1,
+        "title": "🏗️ AWS Infrastructure Health",
+        "type": "stat",
+        "targets": [
+          {
+            "datasource": "CloudWatch",
+            "namespace": "AWS/ApplicationELB",
+            "metricName": "HealthyHostCount",
+            "dimensions": {
+              "TargetGroup": "grafana-tg"
+            },
+            "statistic": "Average",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 0,
+          "y": 0
+        },
+        "options": {
+          "reduceOptions": {
+            "values": false,
+            "calcs": ["lastNotNull"]
+          },
+          "orientation": "auto",
+          "textMode": "auto",
+          "colorMode": "background"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 1},
+                {"color": "green", "value": 2}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "⚡ ECS Service Status",
+        "type": "stat",
+        "targets": [
+          {
+            "datasource": "CloudWatch",
+            "namespace": "AWS/ECS",
+            "metricName": "RunningTaskCount",
+            "dimensions": {
+              "ServiceName": "grafana-service",
+              "ClusterName": "grafana-cluster"
+            },
+            "statistic": "Average",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 6,
+          "y": 0
+        },
+        "options": {
+          "reduceOptions": {
+            "values": false,
+            "calcs": ["lastNotNull"]
+          },
+          "colorMode": "background"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "green", "value": 1}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "💾 EFS Storage Usage",
+        "type": "stat",
+        "targets": [
+          {
+            "datasource": "CloudWatch",
+            "namespace": "AWS/EFS",
+            "metricName": "TotalIOBytes",
+            "statistic": "Sum",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 12,
+          "y": 0
+        },
+        "options": {
+          "reduceOptions": {
+            "values": false,
+            "calcs": ["lastNotNull"]
+          },
+          "colorMode": "value"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "bytes"
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "🔍 CloudWatch Logs",
+        "type": "stat",
+        "targets": [
+          {
+            "datasource": "CloudWatch",
+            "namespace": "AWS/Logs",
+            "metricName": "IncomingLogEvents",
+            "statistic": "Sum",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 18,
+          "y": 0
+        },
+        "options": {
+          "reduceOptions": {
+            "values": false,
+            "calcs": ["lastNotNull"]
+          },
+          "colorMode": "value"
+        }
+      },
+      {
+        "id": 5,
+        "title": "📈 ALB Request Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "datasource": "CloudWatch",
+            "namespace": "AWS/ApplicationELB",
+            "metricName": "RequestCount",
+            "statistic": "Sum",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 8
+        },
+        "yAxes": [
+          {
+            "label": "Requests",
+            "min": 0
+          },
+          {
+            "show": false
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "⏱️ ALB Response Time",
+        "type": "graph",
+        "targets": [
+          {
+            "datasource": "CloudWatch",
+            "namespace": "AWS/ApplicationELB",
+            "metricName": "TargetResponseTime",
+            "statistic": "Average",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 8
+        },
+        "yAxes": [
+          {
+            "label": "Seconds",
+            "min": 0
+          },
+          {
+            "show": false
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "🖥️ ECS CPU Utilization",
+        "type": "graph",
+        "targets": [
+          {
+            "datasource": "CloudWatch",
+            "namespace": "AWS/ECS",
+            "metricName": "CPUUtilization",
+            "dimensions": {
+              "ServiceName": "grafana-service",
+              "ClusterName": "grafana-cluster"
+            },
+            "statistic": "Average",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 16
+        },
+        "yAxes": [
+          {
+            "label": "Percentage",
+            "min": 0,
+            "max": 100
+          },
+          {
+            "show": false
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "🧠 ECS Memory Utilization",
+        "type": "graph",
+        "targets": [
+          {
+            "datasource": "CloudWatch",
+            "namespace": "AWS/ECS",
+            "metricName": "MemoryUtilization",
+            "dimensions": {
+              "ServiceName": "grafana-service",
+              "ClusterName": "grafana-cluster"
+            },
+            "statistic": "Average",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 16
+        },
+        "yAxes": [
+          {
+            "label": "Percentage",
+            "min": 0,
+            "max": 100
+          },
+          {
+            "show": false
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "🔢 Kinesis Stream Metrics",
+        "type": "graph",
+        "targets": [
+          {
+            "datasource": "CloudWatch",
+            "namespace": "AWS/Kinesis",
+            "metricName": "IncomingRecords",
+            "dimensions": {
+              "StreamName": "financial-stream"
+            },
+            "statistic": "Sum",
+            "refId": "A",
+            "legendFormat": "Incoming Records"
+          },
+          {
+            "datasource": "CloudWatch",
+            "namespace": "AWS/Kinesis",
+            "metricName": "OutgoingRecords",
+            "dimensions": {
+              "StreamName": "financial-stream"
+            },
+            "statistic": "Sum",
+            "refId": "B",
+            "legendFormat": "Outgoing Records"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 24
+        },
+        "yAxes": [
+          {
+            "label": "Records",
+            "min": 0
+          },
+          {
+            "show": false
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "⚠️ Lambda Error Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "datasource": "CloudWatch",
+            "namespace": "AWS/Lambda",
+            "metricName": "Errors",
+            "dimensions": {
+              "FunctionName": "kinesis-processor"
+            },
+            "statistic": "Sum",
+            "refId": "A",
+            "legendFormat": "Kinesis Processor Errors"
+          },
+          {
+            "datasource": "CloudWatch",
+            "namespace": "AWS/Lambda",
+            "metricName": "Errors",
+            "dimensions": {
+              "FunctionName": "alert-processor"
+            },
+            "statistic": "Sum",
+            "refId": "B",
+            "legendFormat": "Alert Processor Errors"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 24
+        },
+        "yAxes": [
+          {
+            "label": "Errors",
+            "min": 0
+          },
+          {
+            "show": false
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "title": "📊 System Overview Table",
+        "type": "table",
+        "targets": [
+          {
+            "datasource": "CloudWatch",
+            "namespace": "AWS/ApplicationELB",
+            "metricName": "HealthyHostCount",
+            "statistic": "Average",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 32
+        },
+        "styles": [
+          {
+            "alias": "Component",
+            "align": "left",
+            "colorMode": null,
+            "pattern": "Metric",
+            "type": "string"
+          },
+          {
+            "alias": "Status",
+            "align": "center",
+            "colorMode": "cell",
+            "colors": [
+              "rgba(245, 54, 54, 0.9)",
+              "rgba(237, 129, 40, 0.89)",
+              "rgba(50, 172, 45, 0.97)"
+            ],
+            "pattern": "Value",
+            "thresholds": ["0.5", "0.8"],
+            "type": "number",
+            "unit": "short"
+          }
+        ]
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "current": {
+            "selected": false,
+            "text": "us-east-1",
+            "value": "us-east-1"
+          },
+          "hide": 0,
+          "includeAll": false,
+          "label": "Region",
+          "multi": false,
+          "name": "region",
+          "options": [
+            {
+              "selected": true,
+              "text": "us-east-1",
+              "value": "us-east-1"
+            },
+            {
+              "selected": false,
+              "text": "us-west-2",
+              "value": "us-west-2"
+            },
+            {
+              "selected": false,
+              "text": "eu-west-1",
+              "value": "eu-west-1"
+            }
+          ],
+          "query": "us-east-1,us-west-2,eu-west-1",
+          "type": "custom"
+        }
+      ]
+    }
+  }
+}
