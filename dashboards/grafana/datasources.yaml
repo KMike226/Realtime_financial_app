@@ -4,7 +4,7 @@
 apiVersion: 1
 
 datasources:
-  # CloudWatch pour métriques AWS
+  # CloudWatch pour métriques AWS (optimisé pour temps réel)
   - name: CloudWatch
     type: cloudwatch
     access: proxy
@@ -13,9 +13,13 @@ datasources:
       authType: default
       defaultRegion: us-east-1
       customMetricsNamespaces: "AWS/Lambda,AWS/Kinesis,AWS/S3,CWAgent,FinancialPlatform"
+      queryTimeout: "30s"
+      maxConcurrentQueries: 20
+      cacheEnabled: false
+      cacheExpirySeconds: 0
     editable: true
 
-  # Athena pour requêtes S3
+  # Athena pour requêtes S3 (optimisé pour temps réel)
   - name: Athena
     type: grafana-athena-datasource
     access: proxy
@@ -27,6 +31,10 @@ datasources:
       database: financial_data
       workgroup: primary
       s3OutputLocation: s3://financial-platform-dev-data-lake/athena-results/
+      queryTimeout: "30s"
+      maxConcurrentQueries: 20
+      cacheEnabled: false
+      cacheExpirySeconds: 0
     editable: true
 
   # S3 direct access (si nécessaire)
@@ -40,16 +48,19 @@ datasources:
       defaultBucket: financial-platform-dev-data-lake
     editable: true
 
-  # Prometheus pour métriques custom (si déployé)
+  # Prometheus pour métriques custom (optimisé pour temps réel)
   - name: Prometheus
     type: prometheus
     access: proxy
     uid: prometheus
     url: http://prometheus:9090
     jsonData:
-      timeInterval: "5s"
-      queryTimeout: "60s"
+      timeInterval: "2s"
+      queryTimeout: "30s"
       httpMethod: "GET"
+      maxConcurrentQueries: 20
+      cacheEnabled: false
+      cacheExpirySeconds: 0
     editable: true
     isDefault: false
 
@@ -67,6 +78,20 @@ datasources:
         - "/aws/ecs/financial-platform-dev-grafana"
         - "/aws/apigateway/financial-platform-dev"
     editable: true
+
+  # WebSocket pour streaming temps réel
+  - name: WebSocket Stream
+    type: websocket
+    access: proxy
+    uid: websocket-stream
+    url: ws://localhost:8080/ws
+    jsonData:
+      reconnectInterval: 5000
+      maxReconnectAttempts: 10
+      heartbeatInterval: 30000
+      queryTimeout: "30s"
+    editable: true
+    isDefault: false
 
   # TestData pour les tests et développement
   - name: TestData
