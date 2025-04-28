@@ -1,0 +1,61 @@
+# Requirements pour le serveur WebSocket
+# =====================================
+# Dépendances Python pour le serveur WebSocket avec Flask-SocketIO
+
+# Framework web et WebSocket
+Flask==2.3.3
+Flask-SocketIO==5.3.6
+Flask-CORS==4.0.0
+
+# Gestion des événements asynchrones
+eventlet==0.33.3
+gevent==23.7.0
+gevent-websocket==0.10.1
+
+# Sérialisation et validation
+marshmallow==3.20.1
+marshmallow-sqlalchemy==0.29.0
+
+# Base de données (optionnel pour le WebSocket)
+SQLAlchemy==2.0.21
+
+# Utilitaires
+python-dateutil==2.8.2
+pytz==2023.3
+uuid==1.30
+
+# Logging et monitoring
+structlog==23.1.0
+
+# Variables d'environnement
+python-dotenv==1.0.0
+
+# Client WebSocket pour les tests
+python-socketio==5.9.0
+websocket-client==1.6.4
+
+# Développement et tests
+pytest==7.4.2
+pytest-flask==1.2.0
+pytest-cov==4.1.0
+
+# Performance et monitoring
+psutil==5.9.6
+memory-profiler==0.61.0
+
+# Gestion des threads et processus
+threading-local==1.0.0
+
+# Sécurité
+Werkzeug==2.3.7
+
+# Gestion des erreurs
+flask-limiter==3.5.0
+
+# Cache (optionnel)
+Flask-Caching==2.1.0
+redis==5.0.0
+
+# Configuration avancée
+pyyaml==6.0.1
+configparser==6.0.0
