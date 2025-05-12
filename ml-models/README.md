@@ -1,23 +1,40 @@
-# ML Models - Anomaly Detection
+# ML Models - Financial Analytics
 
-This directory contains machine learning models for the real-time financial application, specifically focused on anomaly detection in financial data.
+This directory contains machine learning models for the real-time financial application, including anomaly detection and price prediction capabilities.
 
 ## Overview
 
+The ML models system provides two main capabilities:
+
+### 1. Anomaly Detection
 The anomaly detection system is designed to identify unusual patterns in financial data such as:
 - Unusual price movements
 - Volume spikes
 - Volatility anomalies
 - Market manipulation patterns
 
+### 2. Price Prediction
+The price prediction system provides forecasts for future price movements:
+- Multi-horizon predictions (1, 5, 10, 20 days)
+- Technical indicators integration
+- Ensemble modeling approach
+- Confidence scoring
+
 ## Features (MVP)
 
-### Core Functionality
-- **Statistical Anomaly Detection**: Z-score and IQR-based methods
-- **Machine Learning Detection**: Isolation Forest algorithm
+### Anomaly Detection
+- **Statistical Methods**: Z-score and IQR-based detection
+- **Machine Learning**: Isolation Forest algorithm
 - **Real-time Processing**: Designed for streaming data
 - **Configurable Thresholds**: Easy customization of detection parameters
 - **Multi-asset Support**: Works with stocks, crypto, and forex data
+
+### Price Prediction
+- **Multiple Models**: Linear regression, Ridge regression, Moving averages
+- **Technical Indicators**: RSI, MACD, Bollinger Bands, Moving averages
+- **Ensemble Approach**: Combines multiple models for better accuracy
+- **Multi-horizon**: Predictions for 1, 5, 10, and 20 days ahead
+- **Confidence Scoring**: Provides confidence levels for predictions
 
 ### Detection Methods
 
@@ -35,11 +52,16 @@ The anomaly detection system is designed to identify unusual patterns in financi
 
 ```
 ml-models/
-├── anomaly_detection.py    # Main anomaly detection class
-├── config.py              # Configuration parameters
-├── train_model.py         # Training and validation pipeline
-├── requirements.txt       # Python dependencies
-└── README.md              # This file
+├── anomaly_detection.py      # Anomaly detection model
+├── price_prediction.py       # Price prediction model
+├── config.py                 # Anomaly detection configuration
+├── prediction_config.py      # Price prediction configuration
+├── train_model.py           # Anomaly detection training
+├── train_prediction_model.py # Price prediction training
+├── pipeline_integration.py   # Anomaly detection pipeline
+├── prediction_pipeline.py   # Price prediction pipeline
+├── requirements.txt         # Python dependencies
+└── README.md               # This file
 ```
 
 ## Quick Start
@@ -51,23 +73,28 @@ ml-models/
 pip install -r requirements.txt
 ```
 
-### Basic Usage
+### Price Prediction Usage
 
 ```python
-from anomaly_detection import FinancialAnomalyDetector, create_sample_data
+from price_prediction import PricePredictor, create_sample_data
 
 # Create sample data
 data = create_sample_data(1000)
 
-# Initialize detector
-detector = FinancialAnomalyDetector()
+# Initialize predictor
+predictor = PricePredictor()
 
-# Detect anomalies
-results = detector.detect_anomalies(data)
+# Prepare data
+prepared_data = predictor.prepare_features(data)
+prepared_data = predictor.create_prediction_targets(prepared_data)
 
-# Get summary
-summary = detector.get_anomaly_summary(results)
-print(f"Detected {summary['anomaly_count']} anomalies")
+# Train models
+training_results = predictor.train_models(prepared_data)
+
+# Make predictions
+predictions = predictor.predict(data, horizon=5)
+summary = predictor.get_prediction_summary(predictions)
+print(f"Predicted change: {summary['best_prediction']['predicted_change_pct']:.2f}%")
 ```
 
 ### Training a Model
