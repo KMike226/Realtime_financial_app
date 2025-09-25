@@ -7,6 +7,35 @@
 
 Pipeline complète de données financières démontrant l'expertise en Data Engineering moderne. Le système ingère, traite et analyse les données de marchés financiers en temps réel pour fournir des insights actionnables et des alertes automatisées.
 
+## 📚 Documentation Technique
+
+### Articles de Blog Détaillés
+
+1. **[Architecture du Pipeline Temps Réel](https://micheekabore.vercel.app/blog/pipeline-donnees-financieres-temps-reel-aws-spark/)**
+   - Vue d'ensemble technique complète
+   - Stack AWS + Apache Spark
+   - Objectifs de performance et résultats
+
+2. **[Infrastructure as Code](https://micheekabore.vercel.app/blog/infrastructure-terraform-github-actions-aws-data-lake/)**
+   - Modules Terraform détaillés
+   - Pipeline CI/CD GitHub Actions
+   - Déploiement automatisé AWS
+
+3. **[Stream Processing Spark](https://micheekabore.vercel.app/blog/stream-processing-spark-structured-streaming-kinesis-snowflake/)**
+   - Apache Spark Structured Streaming
+   - Ingestion multi-sources
+   - Pipeline ETL vers Snowflake
+
+4. **[Machine Learning Production](https://micheekabore.vercel.app/blog/machine-learning-production-detection-anomalies-mlflow/)**
+   - Détection d'anomalies financières
+   - Prédiction de prix avec MLflow
+   - MLOps et déploiement automatisé
+
+5. **[Observabilité Temps Réel](https://micheekabore.vercel.app/blog/observabilite-dashboards-temps-reel-grafana-websockets/)**
+   - Dashboards Grafana interactifs
+   - APIs WebSocket et REST
+   - Système d'alertes multi-canal
+
 ## 🏗️ Architecture
 
 ```
@@ -62,35 +91,6 @@ Pipeline complète de données financières démontrant l'expertise en Data Engi
 - Security hardening AWS IAM
 - Monitoring complet CloudWatch
 - High availability multi-AZ
-
-## 📚 Documentation Technique
-
-### Articles de Blog Détaillés
-
-1. **[Architecture du Pipeline Temps Réel](https://micheekabore.vercel.app/blog/pipeline-donnees-financieres-temps-reel-aws-spark/)**
-   - Vue d'ensemble technique complète
-   - Stack AWS + Apache Spark
-   - Objectifs de performance et résultats
-
-2. **[Infrastructure as Code](https://micheekabore.vercel.app/blog/infrastructure-terraform-github-actions-aws-data-lake/)**
-   - Modules Terraform détaillés
-   - Pipeline CI/CD GitHub Actions
-   - Déploiement automatisé AWS
-
-3. **[Stream Processing Spark](https://micheekabore.vercel.app/blog/stream-processing-spark-structured-streaming-kinesis-snowflake/)**
-   - Apache Spark Structured Streaming
-   - Ingestion multi-sources
-   - Pipeline ETL vers Snowflake
-
-4. **[Machine Learning Production](https://micheekabore.vercel.app/blog/machine-learning-production-detection-anomalies-mlflow/)**
-   - Détection d'anomalies financières
-   - Prédiction de prix avec MLflow
-   - MLOps et déploiement automatisé
-
-5. **[Observabilité Temps Réel](https://micheekabore.vercel.app/blog/observabilite-dashboards-temps-reel-grafana-websockets/)**
-   - Dashboards Grafana interactifs
-   - APIs WebSocket et REST
-   - Système d'alertes multi-canal
 
 ## 🚀 Déploiement Rapide
 
